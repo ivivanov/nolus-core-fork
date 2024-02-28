@@ -112,13 +112,13 @@ jobs:
           tar -C target/release/ -czvf $ARTIFACT_BIN .
 
       - name: Upload binary tar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nolusd-${{ env.VERSION_TAG }}
           path: ${{ env.ARTIFACT_BIN }}
 
       - name: Upload binary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nolusd-${{ env.VERSION_TAG }}
           path: ${{ env.ARTIFACT_BIN }}
@@ -144,7 +144,7 @@ jobs:
           echo "${JSON}" > ${{ env.METADATA_FILE }}
 
       - name: Upload metadata
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nolusd-${{ env.VERSION_TAG }}
           path: |
