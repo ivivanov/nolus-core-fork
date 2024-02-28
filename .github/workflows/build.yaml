@@ -150,8 +150,8 @@ jobs:
         with:
           name: metadata
           path: |
-            ./${METADATA_FILE}
-            ./${CHECKSUM_FILE}
+            ${{ METADATA_FILE }}
+            ${{ CHECKSUM_FILE }}
 
   # Drafts a release
   release:
