@@ -140,11 +140,6 @@ jobs:
           JSON="{\"binaries\": {\"linux/amd64\": \"https://github.com/nolus-protocol/nolus-core/releases/download/${VERSION_TAG}/nolusd?checksum=$HASH\"}}"
           echo $JSON > $METADATA_FILE
       
-      - name: Display structure of downloaded files
-        run: |
-          ls -R
-          cat $METADATA_FILE
-          cat $CHECKSUM_FILE
       - name: Upload metadata
         uses: actions/upload-artifact@v4
         with:
@@ -157,7 +152,7 @@ jobs:
   release:
     name: Draft release
     runs-on: ubuntu-latest
-    needs: build-binary
+    needs: [build-binary, add-meta]
     permissions: write-all
 
     steps:
