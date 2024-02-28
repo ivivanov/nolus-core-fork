@@ -133,6 +133,9 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
 
+      - name: Display structure of downloaded files
+        run: ls -R
+
       - name: Get binary checksum
         run: |
           CHECKSUM=$(shasum -a 256 nolusd-"${VERSION_TAG}"/nolusd)
