@@ -136,7 +136,8 @@ jobs:
         run: |
           CHECKSUM=$(shasum -a 256 nolusd-"${VERSION_TAG}"/nolusd)
           echo "$CHECKSUM" > $CHECKSUM_FILE
-          JSON="{\"binaries\": {\"linux/amd64\": \"https://github.com/nolus-protocol/nolus-core/releases/download/${VERSION_TAG}/nolusd?checksum=${CHECKSUM}\"}}"
+          HASH=$(echo "$CHECKSUM" | cut -d' ' -f1)
+          JSON="{\"binaries\": {\"linux/amd64\": \"https://github.com/nolus-protocol/nolus-core/releases/download/${VERSION_TAG}/nolusd?checksum=$HASH\"}}"
           echo $JSON > ${METADATA_FILE}
       
       - name: Display structure of downloaded files
@@ -149,8 +150,8 @@ jobs:
         with:
           name: metadata
           path: |
-            ${METADATA_FILE}
-            ${CHECKSUM_FILE}
+            ./${METADATA_FILE}
+            ./${CHECKSUM_FILE}
 
   # Drafts a release
   release:
