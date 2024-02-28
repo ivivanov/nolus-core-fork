@@ -137,7 +137,7 @@ jobs:
 
       - name: Get binary checksum
         run: |
-          CHECKSUM=$(shasum -a 256 nolusd)
+          CHECKSUM=$(shasum -a 256 nolusd-"${VERSION_TAG}"/nolusd)
           echo "$CHECKSUM" > $CHECKSUM_FILE
           JSON="{\"binaries\": {\"linux/amd64\": \"https://github.com/nolus-protocol/nolus-core/releases/download/${VERSION_TAG}/nolusd?checksum=${CHECKSUM}\"}}"
           echo $JSON > ${METADATA_FILE}
