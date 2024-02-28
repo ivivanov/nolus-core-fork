@@ -140,15 +140,7 @@ jobs:
 
       - name: Create json
         run: |
-          CHECKSUM=$(cat ${{ env.CHECKSUM_FILE }})
-          JSON=$(cat <<EOF
-          {
-            "binaries": {
-              "linux/amd64": "https://github.com/nolus-protocol/nolus-core/releases/download/${{ env.VERSION_TAG }}/nolusd?checksum=${CHECKSUM}"
-            }
-          }
-          EOF
-          )
+          JSON="{\"binaries\": {\"linux/amd64\": \"https://github.com/nolus-protocol/nolus-core/releases/download/${VERSION}/nolusd?checksum=${CHECKSUM}\"}}"
           echo "${JSON}" > ${{ env.METADATA_FILE }}
 
       - name: Upload metadata
