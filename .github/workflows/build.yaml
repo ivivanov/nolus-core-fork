@@ -19,7 +19,7 @@ env:
   IMAGE_TAG: "1.21.6"
   DOCKERFILE: ".github/images/builder.Dockerfile"
   CHECKSUM_FILE: "sha256sum.txt"
-  METADATA_FILE: "output.json"
+  METADATA_FILE: "${{ github.ref_name }}_binaries.json"
 
 jobs:
   # Checks if builder image exists in docker registry
@@ -138,20 +138,20 @@ jobs:
           echo "$CHECKSUM" > $CHECKSUM_FILE
           HASH=$(echo "$CHECKSUM" | cut -d' ' -f1)
           JSON="{\"binaries\": {\"linux/amd64\": \"https://github.com/nolus-protocol/nolus-core/releases/download/${VERSION_TAG}/nolusd?checksum=$HASH\"}}"
-          echo $JSON > ${METADATA_FILE}
+          echo $JSON > $METADATA_FILE
       
       - name: Display structure of downloaded files
         run: |
           ls -R
-          cat ${METADATA_FILE}
-          cat ${CHECKSUM_FILE}
+          cat $METADATA_FILE
+          cat $CHECKSUM_FILE
       - name: Upload metadata
         uses: actions/upload-artifact@v4
         with:
           name: metadata
           path: |
-            ${{ METADATA_FILE }}
-            ${{ CHECKSUM_FILE }}
+            ${{ env.METADATA_FILE }}
+            ${{ env.CHECKSUM_FILE }}
 
   # Drafts a release
   release:
