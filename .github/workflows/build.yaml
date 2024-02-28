@@ -171,4 +171,4 @@ jobs:
           files: |
             nolusd-tar-${{ env.VERSION_TAG }}
             nolusd-${{ env.VERSION_TAG }}
-            metadata/*
+            metadata
