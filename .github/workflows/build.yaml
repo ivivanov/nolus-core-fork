@@ -111,18 +111,18 @@ jobs:
         run: |
           tar -C target/release/ -czvf $ARTIFACT_BIN .
 
-      - name: Upload binary tar
-        uses: actions/upload-artifact@v4
-        with:
-          name: nolusd-${{ env.VERSION_TAG }}
-          path: ${{ env.ARTIFACT_BIN }}
-
-      # - name: Upload binary
+      # - name: Upload binary tar
       #   uses: actions/upload-artifact@v4
       #   with:
       #     name: nolusd-${{ env.VERSION_TAG }}
       #     path: ${{ env.ARTIFACT_BIN }}
-      #     compression-level: 0 # no compression
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: nolusd-${{ env.VERSION_TAG }}
+          path: ${{ env.ARTIFACT_BIN }}
+          compression-level: 0 # no compression
 
   # Add metadata for cosmovisor
   add-meta:
