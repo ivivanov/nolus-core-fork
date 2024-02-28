@@ -140,15 +140,17 @@ jobs:
           echo $JSON > ${METADATA_FILE}
       
       - name: Display structure of downloaded files
-        run: ls -R
-
+        run: |
+          ls -R
+          cat ${METADATA_FILE}
+          cat ${CHECKSUM_FILE}
       - name: Upload metadata
         uses: actions/upload-artifact@v4
         with:
           name: metadata
           path: |
-            ${{ env.METADATA_FILE }}
-            ${{ env.CHECKSUM_FILE }}
+            ${METADATA_FILE}
+            ${CHECKSUM_FILE}
 
   # Drafts a release
   release:
