@@ -121,8 +121,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nolusd-${{ env.VERSION_TAG }}
-          path: ${{ env.ARTIFACT_BIN }}
-          compression-level: 0 # no compression
+          path: target/release/nolusd
 
   # Add metadata for cosmovisor
   add-meta:
@@ -138,7 +137,7 @@ jobs:
 
       - name: Get binary checksum
         run: |
-          CHECKSUM=$(shasum -a 256 nolusd-"${VERSION_TAG}"/nolusd)
+          CHECKSUM=$(shasum -a 256 nolusd)
           echo "$CHECKSUM" > $CHECKSUM_FILE
           JSON="{\"binaries\": {\"linux/amd64\": \"https://github.com/nolus-protocol/nolus-core/releases/download/${VERSION_TAG}/nolusd?checksum=${CHECKSUM}\"}}"
           echo $JSON > ${METADATA_FILE}
