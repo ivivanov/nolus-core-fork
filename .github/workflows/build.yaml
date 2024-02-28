@@ -135,7 +135,7 @@ jobs:
 
       - name: Get binary checksum
         run: |
-          CHECKSUM=$(shasum -a 256 nolusd-${{ env.VERSION_TAG }})
+          CHECKSUM=$(shasum -a 256 nolusd-${{ env.VERSION_TAG }}/nolusd
           echo "${CHECKSUM}" > ${{ env.CHECKSUM_FILE }}
 
       - name: Create json
