@@ -1,0 +1,45 @@
+name: Nolus-Core
+
+on: 
+  workflow_dispatch:
+
+env:
+  VERSION_TAG: ${{ github.ref_name }}
+  ARTIFACT_BIN: "nolus.tar.gz"
+  AWS_REGISTRY_ID: "013603813222"
+  AWS_REGION: "us-east-1"
+  ERC_REGISTRY: "public.ecr.aws"
+  ERC_REGISTRY_ALIAS: "nolus"
+  ERC_REPOSITORY: "builder"
+  # make sure to update build-binary container tag as well
+  IMAGE_TAG: "1.22.4"
+  DOCKERFILE: ".github/images/builder.Dockerfile"
+  CHECKSUM_FILE: "sha256sum.txt"
+  METADATA_FILE: "${{ github.ref_name }}_binaries.json"
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
+jobs:
+  # Checks if builder image exists in docker registry
+  builder-exists:
+    name: Builder exists
+    runs-on: ubuntu-latest
+    # container: amazon/aws-cli
+    outputs:
+      result: ${{ steps.check.outputs.result }}
+    steps:
+      # - uses: actions/setup-node@v2
+      #   with:
+      #     node-version: '16.x'  # Use an older, insecure Node.js version
+      - uses: "actions/checkout@v4"
+      - id: "check"
+        uses: "./.github/actions/builder-exists"
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          aws-registry-id: ${{ env.AWS_REGISTRY_ID }}
+          aws-erc-repository: ${{ env.ERC_REPOSITORY }}
+          image-tag: ${{ env.IMAGE_TAG }}
+
+      - name: Output result
+        run: echo "The AWS CLI output was ${{ steps.check.outputs.aws_output }}"

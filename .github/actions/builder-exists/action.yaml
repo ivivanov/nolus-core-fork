@@ -1,0 +1,39 @@
+name: builder-exists
+description: "Checks if builder image exists in docker registry"
+
+inputs:
+  aws-access-key-id:
+    description: ""
+    required: true
+  aws-secret-access-key:
+    description: ""
+    required: true
+  aws-region:
+    description: ""
+    required: true
+  aws-registry-id:
+    description: ""
+    required: true
+  aws-erc-repository:
+    description: ""
+    required: true
+  image-tag:
+    description: "Docker image tag"
+    required: true
+
+outputs:
+  result:
+    description: "'failure' -  when no image with such tag exists
+      'success' - image exists"
+    # value: ${{ steps.check.outcome }}
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - ${{ inputs.aws-access-key-id }}
+    - ${{ inputs.aws-secret-access-key }}
+    - ${{ inputs.aws-region }}
+    - ${{ inputs.aws-registry-id }}
+    - ${{ inputs.aws-erc-repository }}
+    - ${{ inputs.image-tag }}
