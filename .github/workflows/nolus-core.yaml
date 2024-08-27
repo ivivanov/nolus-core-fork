@@ -1,6 +1,6 @@
 name: Nolus-Core
 
-on: 
+on:
   workflow_dispatch:
 
 env:
@@ -8,11 +8,11 @@ env:
   ARTIFACT_BIN: "nolus.tar.gz"
   AWS_REGISTRY_ID: "013603813222"
   AWS_REGION: "us-east-1"
-  ERC_REGISTRY: "public.ecr.aws"
-  ERC_REGISTRY_ALIAS: "nolus"
-  ERC_REPOSITORY: "builder"
+  AWS_ERC_REGISTRY: "public.ecr.aws"
+  AWS_ERC_REGISTRY_ALIAS: "nolus"
+  AWS_ERC_REPOSITORY: "builder"
   # make sure to update build-binary container tag as well
-  IMAGE_TAG: "1.22.4"
+  IMAGE_TAG: "1.22.3"
   DOCKERFILE: ".github/images/builder.Dockerfile"
   CHECKSUM_FILE: "sha256sum.txt"
   METADATA_FILE: "${{ github.ref_name }}_binaries.json"
@@ -24,7 +24,7 @@ jobs:
     name: Builder exists
     runs-on: ubuntu-latest
     outputs:
-      result: ${{ steps.check.outputs.result }}
+      exists: ${{ steps.check.outputs.exists }}
     steps:
       - uses: "actions/checkout@v4"
       - id: "check"
@@ -34,8 +34,25 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
           aws-registry-id: ${{ env.AWS_REGISTRY_ID }}
-          aws-erc-repository: ${{ env.ERC_REPOSITORY }}
+          aws-erc-repository: ${{ env.AWS_ERC_REPOSITORY }}
           image-tag: ${{ env.IMAGE_TAG }}
 
-      - name: Output result
-        run: echo "The AWS CLI output was ${{ steps.check.outputs.aws_output }}"
+  # Builds and push builder image if it does not exist
+  builder-create:
+    name: Create builder image
+    needs: builder-exists
+    runs-on: ubuntu-latest
+    if: needs.builder-exists.outputs.exists
+
+    steps:
+      - name: some echo
+        run: echo ${{ needs.builder-exists.outputs.exists }}
+      # - uses: actions/checkout@v4
+      # - uses: "./.github/actions/builder-create"
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ${{ env.AWS_REGION }}
+      #     aws-registry-id: ${{ env.AWS_REGISTRY_ID }}
+      #     aws-erc-repository: ${{ env.AWS_ERC_REPOSITORY }}
+      #     image-tag: ${{ env.IMAGE_TAG }}

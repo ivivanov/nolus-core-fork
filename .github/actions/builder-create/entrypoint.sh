@@ -22,19 +22,13 @@ aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
 aws configure set region "$AWS_REGION"
 
 # Execute the AWS CLI command
-aws ecr-public describe-images \
-  --registry-id "$AWS_REGISTRY_ID" \
-  --repository-name "$AWS_ECR_REPOSITORY" \
-  --region "$AWS_REGION" \
-  --image-ids imageTag="$IMAGE_TAG" 2>&1
+# aws ecr-public describe-images \
+#   --registry-id "$AWS_REGISTRY_ID" \
+#   --repository-name "$AWS_ECR_REPOSITORY" \
+#   --region "$AWS_REGION" \
+#   --image-ids imageTag="$IMAGE_TAG" 2>&1
 
-status=$?
+# echo "aws_output=$?" >> $GITHUB_OUTPUT
 
-# Determine if the command failed (status > 0)
-if [ "$status" -ne 0 ]; then
-  exists=true
-else
-  exists=false
-fi
-
-echo "exists=$exists" >> "$GITHUB_OUTPUT"
+docker build -t $ERC_REGISTRY/$ERC_REGISTRY_ALIAS/$ERC_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE .
+            docker push $ERC_REGISTRY/$ERC_REGISTRY_ALIAS/$ERC_REPOSITORY:$IMAGE_TAG
