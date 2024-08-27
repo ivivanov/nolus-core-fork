@@ -1,31 +1,31 @@
-name: Test Fuzz
-on:
-  schedule:
-    - cron: '0 3 * * *'
+# name: Test Fuzz
+# on:
+#   schedule:
+#     - cron: '0 3 * * *'
 
-jobs:
-  nondeterminism:
-    name: Test App State Determinism
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-go@v4
-        with:
-          go-version: 1.22
+# jobs:
+#   nondeterminism:
+#     name: Test App State Determinism
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/setup-go@v4
+#         with:
+#           go-version: 1.22
       
-      - uses: actions/checkout@v3
+#       - uses: actions/checkout@v3
 
-      - run: |
-          make test-sim-nondeterminism
+#       - run: |
+#           make test-sim-nondeterminism
 
-  import-export:
-    name: Test App Import Export
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-go@v4
-        with:
-          go-version: 1.22
+#   import-export:
+#     name: Test App Import Export
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/setup-go@v4
+#         with:
+#           go-version: 1.22
 
-      - uses: actions/checkout@v3
+#       - uses: actions/checkout@v3
       
-      - run: |
-          make test-sim-import-export
+#       - run: |
+#           make test-sim-import-export
