@@ -22,10 +22,8 @@ inputs:
     required: true
 
 outputs:
-  result:
-    description: "'failure' -  when no image with such tag exists
-      'success' - image exists"
-    # value: ${{ steps.check.outcome }}
+  aws_output:
+    description: "Error code - non zero means the image does not exist"
 
 runs:
   using: "docker"
