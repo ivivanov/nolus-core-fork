@@ -12,7 +12,7 @@ env:
   AWS_ERC_REGISTRY_ALIAS: "nolus"
   AWS_ERC_REPOSITORY: "builder"
   # make sure to update build-binary container tag as well
-  IMAGE_TAG: "1.22.3"
+  IMAGE_TAG: "1.22.4"
   DOCKERFILE: ".github/images/builder.Dockerfile"
   CHECKSUM_FILE: "sha256sum.txt"
   METADATA_FILE: "${{ github.ref_name }}_binaries.json"
@@ -42,7 +42,7 @@ jobs:
     name: Create builder image
     needs: builder-exists
     runs-on: ubuntu-latest
-    if: needs.builder-exists.outputs.exists
+    if: needs.builder-exists.outputs.exists == 'true'
 
     steps:
       - name: some echo
