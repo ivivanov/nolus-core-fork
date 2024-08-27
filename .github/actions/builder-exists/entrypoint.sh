@@ -31,7 +31,7 @@ aws ecr-public describe-images \
 status=$?
 
 # Determine if the command failed (status > 0)
-if [ "$status" -ne 0 ]; then
+if [ "$status" -eq 0 ]; then
   exists=true
 else
   exists=false
