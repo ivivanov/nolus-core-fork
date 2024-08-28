@@ -1,0 +1,84 @@
+name: Nolus-Core
+
+on:
+  workflow_dispatch:
+  push:
+
+env:
+  VERSION_TAG: ${{ github.ref_name }}
+  ARTIFACT_BIN: "nolus.tar.gz"
+  # make sure to update build-binary container tag as well
+  CONTAINER_REGISTRY: ghcr.io
+  BUILDER_IMAGE_TAG: "1.22.3"
+  BUILDER_IMAGE_NAME: "builder"
+  DOCKERFILE: ".github/images/builder.Dockerfile"
+  CHECKSUM_FILE: "sha256sum.txt"
+  METADATA_FILE: "${{ github.ref_name }}_binaries.json"
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
+jobs:
+  builder-exists:
+    name: Builder exists
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - id: "check"
+        name: Check if image exists
+        run: |-
+          if docker manifest inspect ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}/${{ env.BUILDER_IMAGE_NAME }}:${{ env.BUILDER_IMAGE_TAG }} > /dev/null 2>&1; then
+            exists=true
+          else
+            exists=false
+          fi
+          echo "exists=$exists" >> "$GITHUB_OUTPUT"
+
+  builder-create:
+    name: Create builder image
+    needs: builder-exists
+    runs-on: ubuntu-latest
+    if: needs.builder-exists.outputs.exists == 'false'
+
+    steps:
+      - run: |-
+          echo "needs.builder-exists.outputs.exists" 
+          echo "$needs.builder-exists.outputs.exists"
+
+  lint-go:
+    name: Run golangci-lint
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo lint is OK
+
+  test-unit:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    needs: lint-go
+    steps:
+      - run: |-
+          echo tests are OK 
+
+  test-unit-coverage:
+    name: Code coverage reports
+    needs: test-unit
+    runs-on: ubuntu-latest
+    steps:
+      - run: |-
+          echo tests are OK 
+
+
+  build-binary:
+    name: Build binary
+    runs-on: ubuntu-latest
+    container:
+      # image name needs to be hardcoded: https://github.com/orgs/community/discussions/26324
+      image: "public.ecr.aws/nolus/builder:1.22.3"
+    needs: [builder-create, test-unit-coverage]
+    if: >
+      (needs.builder-create.result == 'skipped') ||
+      (needs.builder-create.result == 'success') ||
+      (needs.test-unit-coverage.result == 'success')
+
+
+    steps:
+      - run: echo "triggeres"
