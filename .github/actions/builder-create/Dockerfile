@@ -1,19 +1,17 @@
-# Use the official Ubuntu image as the base image
-FROM ubuntu:22.04
+FROM alpine:latest
 
-# Set environment variables to non-interactive to avoid prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && \
-    apt-get install -y \
+RUN apk update && \
+    apk add --no-cache \
     curl \
-    unzip \
     python3 \
-    python3-pip \
-    && rm -rf /var/lib/apt/lists/*
+    py3-pip \
+    docker-cli \
+    bash
 
 RUN pip3 install awscli --upgrade
-RUN aws --version
+RUN aws --version && docker --version
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
