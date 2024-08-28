@@ -42,7 +42,7 @@ jobs:
           context: .
           file: ${{ env.DOCKERFILE }}
           push: true
-          tags: ghcr.io/${{ github.repository }}/builder:${{ IMAGE_TAG }}
+          tags: ghcr.io/${{ github.repository }}/builder:${{ env.IMAGE_TAG }}
 
       - name: Image digest
         run: echo "Image digest ${{ steps.build.outputs.digest }}"
