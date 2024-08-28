@@ -2,6 +2,7 @@ name: Nolus-Core
 
 on:
   workflow_dispatch:
+  push:
 
 env:
   VERSION_TAG: ${{ github.ref_name }}
@@ -19,40 +20,66 @@ env:
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
 jobs:
-  # Checks if builder image exists in docker registry
-  builder-exists:
-    name: Builder exists
+  builder-image:
     runs-on: ubuntu-latest
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
     steps:
-      - uses: "actions/checkout@v4"
-      - id: "check"
-        uses: "./.github/actions/builder-exists"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-          aws-registry-id: ${{ env.AWS_REGISTRY_ID }}
-          aws-ecr-repository: ${{ env.AWS_ECR_REPOSITORY }}
-          image-tag: ${{ env.IMAGE_TAG }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ env.DOCKERFILE }}
+          push: true
+          tags: ghcr.io/${{ github.repository }}/builder:${{ IMAGE_TAG }}
+
+      - name: Image digest
+        run: echo "Image digest ${{ steps.build.outputs.digest }}"
+  # Checks if builder image exists in docker registry
+  # builder-exists:
+  #   name: Builder exists
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     exists: ${{ steps.check.outputs.exists }}
+  #   steps:
+  #     - uses: "actions/checkout@v4"
+  #     - id: "check"
+  #       uses: "./.github/actions/builder-exists"
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: ${{ env.AWS_REGION }}
+  #         aws-registry-id: ${{ env.AWS_REGISTRY_ID }}
+  #         aws-ecr-repository: ${{ env.AWS_ECR_REPOSITORY }}
+  #         image-tag: ${{ env.IMAGE_TAG }}
 
   # Builds and push builder image if it does not exist
-  builder-create:
-    name: Create builder image
-    needs: builder-exists
-    runs-on: ubuntu-latest
-    if: needs.builder-exists.outputs.exists == 'false'
+  # builder-create:
+  #   name: Create builder image
+  #   needs: builder-exists
+  #   runs-on: ubuntu-latest
+  #   if: needs.builder-exists.outputs.exists == 'false'
 
-    steps:
-      - uses: actions/checkout@v4
-      - uses: "./.github/actions/builder-create"
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-          aws-ecr-registry: ${{ env.AWS_ECR_REGISTRY }}
-          aws-ecr-registry-alias: ${{ env.AWS_ECR_REGISTRY_ALIAS }}
-          aws-ecr-repository: ${{ env.AWS_ECR_REPOSITORY }}
-          dockerfile: ${{ env.DOCKERFILE }}
-          image-tag: ${{ env.IMAGE_TAG }}
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: "./.github/actions/builder-create"
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: ${{ env.AWS_REGION }}
+  #         aws-ecr-registry: ${{ env.AWS_ECR_REGISTRY }}
+  #         aws-ecr-registry-alias: ${{ env.AWS_ECR_REGISTRY_ALIAS }}
+  #         aws-ecr-repository: ${{ env.AWS_ECR_REPOSITORY }}
+  #         dockerfile: ${{ env.DOCKERFILE }}
+  #         image-tag: ${{ env.IMAGE_TAG }}
