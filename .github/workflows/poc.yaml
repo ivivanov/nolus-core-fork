@@ -9,7 +9,7 @@ env:
   ARTIFACT_BIN: "nolus.tar.gz"
   # make sure to update build-binary container tag as well
   CONTAINER_REGISTRY: ghcr.io
-  BUILDER_IMAGE_TAG: "1.22.3"
+  BUILDER_IMAGE_TAG: "1.22.3-t"
   BUILDER_IMAGE_NAME: "builder"
   DOCKERFILE: ".github/images/builder.Dockerfile"
   CHECKSUM_FILE: "sha256sum.txt"
