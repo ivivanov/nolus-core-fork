@@ -11,10 +11,16 @@ inputs:
   aws-region:
     description: ""
     required: true
-  aws-registry-id:
+  aws-ecr-registry:
     description: ""
     required: true
-  aws-erc-repository:
+  aws-ecr-registry-alias:
+    description: ""
+    required: true
+  aws-ecr-repository:
+    description: ""
+    required: true
+  dockerfile:
     description: ""
     required: true
   image-tag:
@@ -32,6 +38,8 @@ runs:
     - ${{ inputs.aws-access-key-id }}
     - ${{ inputs.aws-secret-access-key }}
     - ${{ inputs.aws-region }}
-    - ${{ inputs.aws-registry-id }}
-    - ${{ inputs.aws-erc-repository }}
+    - ${{ inputs.aws-ecr-registry }}
+    - ${{ inputs.aws-ecr-registry-alias }}
+    - ${{ inputs.aws-ecr-repository }}
+    - ${{ inputs.dockerfile }}
     - ${{ inputs.image-tag }}

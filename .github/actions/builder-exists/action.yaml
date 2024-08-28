@@ -14,7 +14,7 @@ inputs:
   aws-registry-id:
     description: ""
     required: true
-  aws-erc-repository:
+  aws-ecr-repository:
     description: ""
     required: true
   image-tag:
@@ -33,5 +33,5 @@ runs:
     - ${{ inputs.aws-secret-access-key }}
     - ${{ inputs.aws-region }}
     - ${{ inputs.aws-registry-id }}
-    - ${{ inputs.aws-erc-repository }}
+    - ${{ inputs.aws-ecr-repository }}
     - ${{ inputs.image-tag }}

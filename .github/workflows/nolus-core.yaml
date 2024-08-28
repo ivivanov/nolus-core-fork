@@ -8,11 +8,11 @@ env:
   ARTIFACT_BIN: "nolus.tar.gz"
   AWS_REGISTRY_ID: "013603813222"
   AWS_REGION: "us-east-1"
-  AWS_ERC_REGISTRY: "public.ecr.aws"
-  AWS_ERC_REGISTRY_ALIAS: "nolus"
-  AWS_ERC_REPOSITORY: "builder"
+  AWS_ECR_REGISTRY: "public.ecr.aws"
+  AWS_ECR_REGISTRY_ALIAS: "nolus"
+  AWS_ECR_REPOSITORY: "builder"
   # make sure to update build-binary container tag as well
-  IMAGE_TAG: "1.22.4"
+  IMAGE_TAG: "1.22.3"
   DOCKERFILE: ".github/images/builder.Dockerfile"
   CHECKSUM_FILE: "sha256sum.txt"
   METADATA_FILE: "${{ github.ref_name }}_binaries.json"
@@ -34,7 +34,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
           aws-registry-id: ${{ env.AWS_REGISTRY_ID }}
-          aws-erc-repository: ${{ env.AWS_ERC_REPOSITORY }}
+          aws-ecr-repository: ${{ env.AWS_ECR_REPOSITORY }}
           image-tag: ${{ env.IMAGE_TAG }}
 
   # Builds and push builder image if it does not exist
@@ -42,17 +42,17 @@ jobs:
     name: Create builder image
     needs: builder-exists
     runs-on: ubuntu-latest
-    if: needs.builder-exists.outputs.exists == 'true'
+    if: needs.builder-exists.outputs.exists == 'false'
 
     steps:
-      - name: some echo
-        run: echo ${{ needs.builder-exists.outputs.exists }}
-      # - uses: actions/checkout@v4
-      # - uses: "./.github/actions/builder-create"
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: ${{ env.AWS_REGION }}
-      #     aws-registry-id: ${{ env.AWS_REGISTRY_ID }}
-      #     aws-erc-repository: ${{ env.AWS_ERC_REPOSITORY }}
-      #     image-tag: ${{ env.IMAGE_TAG }}
+      - uses: actions/checkout@v4
+      - uses: "./.github/actions/builder-create"
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+          aws-ecr-registry: ${{ env.AWS_ECR_REGISTRY }}
+          aws-ecr-registry-alias: ${{ env.AWS_ECR_REGISTRY_ALIAS }}
+          aws-ecr-repository: ${{ env.AWS_ECR_REPOSITORY }}
+          dockerfile: ${{ env.DOCKERFILE }}
+          image-tag: ${{ env.IMAGE_TAG }}
