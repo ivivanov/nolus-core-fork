@@ -38,18 +38,19 @@ jobs:
       #     username: ${{ github.actor }}
       #     password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Check if image exists
+      - id: "check"
+        name: Check if image exists
         run: |-
           if docker manifest inspect ghcr.io/${{ github.repository }}/builder:${{ env.IMAGE_TAG }} > /dev/null 2>&1; then
             exists=true
           else
             exists=false
           fi
-          echo "IMAGE_EXISTS=$exists" >> "$GITHUB_ENV"
+          echo "exists=$exists" >> "$GITHUB_OUTPUT"
 
       - name: Check if image exists
         run: |-
-          echo "$IMAGE_EXISTS"
+          echo ${{ steps.check.outputs.exists }}
 
   builder-create:
     name: Create builder image
