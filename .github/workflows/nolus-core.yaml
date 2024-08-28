@@ -7,12 +7,13 @@ on:
 env:
   VERSION_TAG: ${{ github.ref_name }}
   ARTIFACT_BIN: "nolus.tar.gz"
-  AWS_REGISTRY_ID: "013603813222"
-  AWS_REGION: "us-east-1"
-  AWS_ECR_REGISTRY: "public.ecr.aws"
-  AWS_ECR_REGISTRY_ALIAS: "nolus"
-  AWS_ECR_REPOSITORY: "builder"
+  # AWS_REGISTRY_ID: "013603813222"
+  # AWS_REGION: "us-east-1"
+  # AWS_ECR_REGISTRY: "public.ecr.aws"
+  # AWS_ECR_REGISTRY_ALIAS: "nolus"
+  # AWS_ECR_REPOSITORY: "builder"
   # make sure to update build-binary container tag as well
+  CONTAINER_REGISTRY: ghcr.io
   IMAGE_TAG: "test"
   DOCKERFILE: ".github/images/builder.Dockerfile"
   CHECKSUM_FILE: "sha256sum.txt"
@@ -32,9 +33,9 @@ jobs:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.CR_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
