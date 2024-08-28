@@ -60,10 +60,12 @@ jobs:
             echo "tag_matches=false" >> $GITHUB_ENV
           fi
 
-      - name: Deploy application
+      - name: Continue
         if: env.tag_matches == 'true'
-        run: echo "Deploying application for tag ${{ github.ref_name }}"
-      - run: echo lint is OK
+        run: echo "Job is allowed to continue"
+      
+      - name: Some echo
+        run: echo "lint is OK"
 
   test-unit:
     name: Run unit tests
