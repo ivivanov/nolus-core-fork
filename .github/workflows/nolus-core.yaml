@@ -230,13 +230,16 @@ jobs:
           fi
 
       - name: Download artifacts
+        if: env.tag_matches == 'true'
         uses: actions/download-artifact@v4
 
       - name: Display structure of downloaded files
+        if: env.tag_matches == 'true'
         run: ls -R
 
       # temporary using commit as version until it is merged. Updates node version v12 -> v16
       - uses: "marvinpinto/action-automatic-releases@6273874b61ebc8c71f1a61b2d98e234cf389b303"
+        if: env.tag_matches == 'true'
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false

@@ -68,7 +68,7 @@ jobs:
         continue-on-error: true
       
       - name: Some echo
-        if: always() && success()
+        if: env.tag_matches == 'true'
         run: echo "lint is OK"
 
   test-unit:
