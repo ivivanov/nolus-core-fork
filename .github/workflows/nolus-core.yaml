@@ -2,7 +2,7 @@ name: Nolus-Core
 
 on:
   workflow_dispatch:
-  push:
+  # push:
 
 env:
   VERSION_TAG: ${{ github.ref_name }}
