@@ -1,13 +1,19 @@
-FROM amazon/aws-cli:2.17.38
+# Use the official Ubuntu image as the base image
+FROM ubuntu:22.04
 
-RUN apk add curl tar && \
-  curl -s https://download.docker.com/linux/static/stable/x86_64/docker-20.10.9.tgz | tar -xzf-
+# Set environment variables to non-interactive to avoid prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
 
-ENV DOCKER_HOST="tcp://docker:2376" \
-    DOCKER_TLS_VERIFY=1 \
-    DOCKER_TLS_CERTDIR="/certs" \
-    DOCKER_CERT_PATH="/certs/client"
+RUN apt-get update && \
+    apt-get install -y \
+    curl \
+    unzip \
+    python3 \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
 
+RUN pip3 install awscli --upgrade
+RUN aws --version
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
