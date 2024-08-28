@@ -61,8 +61,10 @@ jobs:
           fi
 
       - name: Continue
-        if: env.tag_matches == 'true'
-        run: echo "Job is allowed to continue"
+        if: env.tag_matches == 'false'
+        run: |- 
+          echo "Job is not allowed to continue"
+          exit 0
       
       - name: Some echo
         run: echo "lint is OK"
