@@ -151,7 +151,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       # image name needs to be hardcoded: https://github.com/orgs/community/discussions/26324
-      image: "public.ecr.aws/nolus/builder:1.22.3"
+      # TODO: change repo!
+      image: "ghcr.io/ivivanov/nolus-core-fork/builder:1.22.3"
     needs: [builder-create, test-unit-coverage]
     if: >
       always() &&
