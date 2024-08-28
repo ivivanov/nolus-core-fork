@@ -1,8 +1,17 @@
-FROM amazon/aws-cli:2.17.38 AS aws-cli
-FROM docker:20.10-dind AS docker-dind
+FROM alpine
 
-COPY --from=aws-cli /usr/local/bin/aws /usr/local/bin/aws
-RUN apk add --no-cache bash
+RUN apk add curl tar && \
+  curl -s https://download.docker.com/linux/static/stable/x86_64/docker-20.10.9.tgz | tar -xzf-
+
+FROM amazon/aws-cli:2.17.38
+
+ENV DOCKER_HOST="tcp://docker:2376" \
+    DOCKER_TLS_VERIFY=1 \
+    DOCKER_TLS_CERTDIR="/certs" \
+    DOCKER_CERT_PATH="/certs/client"
+
+COPY --from=0 /docker/docker /usr/local/bin
 COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
