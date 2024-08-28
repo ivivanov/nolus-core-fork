@@ -65,10 +65,9 @@ jobs:
         run: |- 
           echo "Job is not allowed to continue"
           exit 1
-        continue-on-error: true
       
       - name: Some echo
-        if: env.tag_matches == 'true'
+        # if: env.tag_matches == 'true'
         run: echo "lint is OK"
 
   test-unit:
