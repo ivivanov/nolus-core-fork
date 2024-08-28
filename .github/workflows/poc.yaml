@@ -3,10 +3,10 @@ name: Nolus-Core
 on:
   workflow_dispatch:
   push:
-    branches: 
-      - '**'  # Match any branch
-    tags: 
-      - '**'  # Match any tag
+    branches:
+      - "**" # Match any branch
+    tags:
+      - "**" # Match any tag
 
 env:
   VERSION_TAG: ${{ github.ref_name }}
@@ -50,8 +50,19 @@ jobs:
   lint-go:
     name: Run golangci-lint
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v') && matches(github.ref, 'refs/tags/v[0-9]+.[0-9]+.[0-9]+')
     steps:
+      - run: |
+          if [[ "${GITHUB_REF}" =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Tag matches pattern."
+            echo "tag_matches=true" >> $GITHUB_ENV
+          else
+            echo "Tag does not match pattern."
+            echo "tag_matches=false" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy application
+        if: env.tag_matches == 'true'
+        run: echo "Deploying application for tag ${{ github.ref_name }}"
       - run: echo lint is OK
 
   test-unit:
@@ -60,7 +71,7 @@ jobs:
     needs: lint-go
     steps:
       - run: |-
-          echo tests are OK 
+          echo tests are OK
 
   test-unit-coverage:
     name: Code coverage reports
@@ -68,8 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |-
-          echo tests are OK 
-
+          echo tests are OK
 
   build-binary:
     name: Build binary
