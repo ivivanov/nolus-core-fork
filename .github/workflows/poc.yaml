@@ -41,8 +41,7 @@ jobs:
 
     steps:
       - run: |-
-          echo "needs.builder-exists.outputs.exists" 
-          echo "$needs.builder-exists.outputs.exists"
+          exit 1
 
   lint-go:
     name: Run golangci-lint
