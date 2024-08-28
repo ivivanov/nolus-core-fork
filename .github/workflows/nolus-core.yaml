@@ -2,7 +2,11 @@ name: Nolus-Core
 
 on:
   workflow_dispatch:
-  # push:
+  push:
+    branches:
+      - "**" # Match any branch
+    tags:
+      - "**" # Match any tag
 
 env:
   VERSION_TAG: ${{ github.ref_name }}
@@ -212,6 +216,7 @@ jobs:
 
   # Drafts a Github release
   # Only tags which match the protected tag pattern will trigger this job
+  # Tag pattern: v*.*.*
   release:
     name: Draft release
     runs-on: ubuntu-latest
@@ -229,6 +234,7 @@ jobs:
             echo "tag_matches=false" >> $GITHUB_ENV
           fi
 
+      # The job will continue only if the tag matches the pattern
       - name: Download artifacts
         if: env.tag_matches == 'true'
         uses: actions/download-artifact@v4
