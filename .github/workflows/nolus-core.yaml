@@ -14,7 +14,7 @@ env:
   # AWS_ECR_REPOSITORY: "builder"
   # make sure to update build-binary container tag as well
   CONTAINER_REGISTRY: ghcr.io
-  IMAGE_TAG: "test"
+  IMAGE_TAG: "test2"
   DOCKERFILE: ".github/images/builder.Dockerfile"
   CHECKSUM_FILE: "sha256sum.txt"
   METADATA_FILE: "${{ github.ref_name }}_binaries.json"
