@@ -8,7 +8,6 @@ ENV DOCKER_HOST="tcp://docker:2376" \
     DOCKER_TLS_CERTDIR="/certs" \
     DOCKER_CERT_PATH="/certs/client"
 
-COPY --from=0 /docker/docker /usr/local/bin
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
