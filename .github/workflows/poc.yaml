@@ -73,11 +73,10 @@ jobs:
     container:
       # image name needs to be hardcoded: https://github.com/orgs/community/discussions/26324
       image: "public.ecr.aws/nolus/builder:1.22.3"
-    needs: [builder-create, test-unit-coverage]
+    needs: test-unit-coverage
     if: >
       (needs.builder-create.result == 'skipped') ||
-      (needs.builder-create.result == 'success') ||
-      (needs.test-unit-coverage.result == 'success')
+      (needs.builder-create.result == 'success')
 
 
     steps:
