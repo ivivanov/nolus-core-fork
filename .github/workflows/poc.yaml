@@ -45,7 +45,7 @@ jobs:
 
     steps:
       - run: |-
-          if [[ $(needs.builder-exists.outputs.exists) == 'true' ]]; then
+          if [[ ${{ needs.builder-exists.outputs.exists }} == 'true' ]]; then
             echo "Skip builder creation."
             exit 1
           fi
