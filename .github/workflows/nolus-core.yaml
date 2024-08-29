@@ -21,129 +21,129 @@ env:
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
 jobs:
-  # # Checks if builder docker image exists
-  # builder-exists:
-  #   name: Builder exists
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     exists: ${{ steps.check.outputs.exists }}
-  #   steps:
-  #     - id: "check"
-  #       name: Check if image exists
-  #       run: |-
-  #         if docker manifest inspect ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}/${{ env.BUILDER_IMAGE_NAME }}:${{ env.BUILDER_IMAGE_TAG }} > /dev/null 2>&1; then
-  #           exists=true
-  #         else
-  #           exists=false
-  #         fi
-  #         echo "exists=$exists" >> "$GITHUB_OUTPUT"
+  # Checks if builder docker image exists
+  builder-exists:
+    name: Builder exists
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - id: "check"
+        name: Check if image exists
+        run: |-
+          if docker manifest inspect ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}/${{ env.BUILDER_IMAGE_NAME }}:${{ env.BUILDER_IMAGE_TAG }} > /dev/null 2>&1; then
+            exists=true
+          else
+            exists=false
+          fi
+          echo "exists=$exists" >> "$GITHUB_OUTPUT"
 
-  #     - name: Check if image exists
-  #       run: |-
-  #         echo ${{ steps.check.outputs.exists }}
+      - name: Check if image exists
+        run: |-
+          echo ${{ steps.check.outputs.exists }}
 
-  # # Build and push builder docker image
-  # builder-create:
-  #   name: Create builder image
-  #   needs: builder-exists
-  #   runs-on: ubuntu-latest
-  #   if: needs.builder-exists.outputs.exists == 'false'
+  # Build and push builder docker image
+  builder-create:
+    name: Create builder image
+    needs: builder-exists
+    runs-on: ubuntu-latest
+    if: needs.builder-exists.outputs.exists == 'false'
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-  #     - name: Log in to GitHub Container Registry
-  #       uses: docker/login-action@v3
-  #       with:
-  #         registry: ${{ env.CONTAINER_REGISTRY }}
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-  #     - name: Build and push Docker image
-  #       uses: docker/build-push-action@v6
-  #       with:
-  #         context: .
-  #         file: ${{ env.DOCKERFILE }}
-  #         push: true
-  #         tags: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}/${{ env.BUILDER_IMAGE_NAME }}:${{ env.BUILDER_IMAGE_TAG }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ env.DOCKERFILE }}
+          push: true
+          tags: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}/${{ env.BUILDER_IMAGE_NAME }}:${{ env.BUILDER_IMAGE_TAG }}
 
-  # lint-go:
-  #   name: Run golangci-lint
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/setup-go@v5
-  #       with:
-  #         go-version: 1.22
-  #         cache: false
+  lint-go:
+    name: Run golangci-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.22
+          cache: false
 
-  #     - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-  #     - name: golangci-lint
-  #       uses: golangci/golangci-lint-action@v6
-  #       with:
-  #         version: v1.55.2
-  #         # Optional: if set to true, then all caching functionality will be completely disabled,
-  #         #           takes precedence over all other caching options.
-  #         skip-cache: true
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.55.2
+          # Optional: if set to true, then all caching functionality will be completely disabled,
+          #           takes precedence over all other caching options.
+          skip-cache: true
 
-  #         # Optional: The mode to install golangci-lint. It can be 'binary' or 'goinstall'.
-  #         install-mode: "goinstall"
+          # Optional: The mode to install golangci-lint. It can be 'binary' or 'goinstall'.
+          install-mode: "goinstall"
 
-  # test-unit:
-  #   name: Run unit tests
-  #   runs-on: ubuntu-latest
-  #   needs: lint-go
-  #   steps:
-  #     - uses: actions/setup-go@v5
-  #       with:
-  #         go-version: 1.22
-  #         cache: false
+  test-unit:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    needs: lint-go
+    steps:
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.22
+          cache: false
 
-  #     - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-  #     - run: |
-  #         make test-unit
+      - run: |
+          make test-unit
 
-  #     - name: Archive code coverage results
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: coverage-results-out
-  #         path: |
-  #           cover.out
-  #         retention-days: 1
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-results-out
+          path: |
+            cover.out
+          retention-days: 1
 
-  # test-unit-coverage:
-  #   name: Code coverage reports
-  #   needs: test-unit
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/setup-go@v5
-  #       with:
-  #         go-version: 1.22
-  #         cache: false
+  test-unit-coverage:
+    name: Code coverage reports
+    needs: test-unit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.22
+          cache: false
 
-  #     - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-  #     - name: Download coverage result
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: coverage-results-out
+      - name: Download coverage result
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-results-out
 
-  #     - run: |
-  #         make test-unit-coverage
-  #         make test-unit-coverage-report
+      - run: |
+          make test-unit-coverage
+          make test-unit-coverage-report
 
-  #     - name: Upload artifacts
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: coverage-reports
-  #         path: |
-  #           coverage.xml
-  #           coverage.html
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            coverage.xml
+            coverage.html
 
   build-binary:
     name: Build binary
@@ -152,11 +152,11 @@ jobs:
       # image name needs to be hardcoded: https://github.com/orgs/community/discussions/26324
       # TODO: change repo!
       image: "ghcr.io/ivivanov/nolus-core-fork/builder:1.22.3"
-    # needs: [builder-create, test-unit-coverage]
-    # if: >
-    #   always() &&
-    #   (needs.test-unit-coverage.result == 'success') &&
-    #   (needs.builder-create.result == 'skipped' || needs.builder-create.result == 'success')
+    needs: [builder-create, test-unit-coverage]
+    if: >
+      always() &&
+      (needs.test-unit-coverage.result == 'success') &&
+      (needs.builder-create.result == 'skipped' || needs.builder-create.result == 'success')
 
     steps:
       - uses: actions/checkout@v4
@@ -192,8 +192,12 @@ jobs:
   # Add metadata for cosmovisor
   add-meta:
     name: Add metadata
-    needs: build-binary
     runs-on: ubuntu-latest
+    needs: build-binary
+    if: >
+      always() &&
+      (needs.build-binary.result == 'success')
+
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
@@ -227,10 +231,10 @@ jobs:
       - name: Check if protected tag is denoted
         run: |
           if [[ "${GITHUB_REF}" =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Tag matches pattern."
+            echo "Tag matches pattern v*.*.*"
             echo "tag_matches=true" >> $GITHUB_ENV
           else
-            echo "Tag does not match pattern."
+            echo "Tag does not match pattern v*.*.*"
             echo "tag_matches=false" >> $GITHUB_ENV
           fi
 
