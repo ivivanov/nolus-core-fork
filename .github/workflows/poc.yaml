@@ -1,12 +1,12 @@
-name: Nolus-Core
+name: POC
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - "**" # Match any branch
-  #   tags:
-  #     - "**" # Match any tag
+  push:
+    branches:
+      - "**" # Match any branch
+    tags:
+      - "**" # Match any tag
 
 env:
   VERSION_TAG: ${{ github.ref_name }}
@@ -41,11 +41,16 @@ jobs:
     name: Create builder image
     needs: builder-exists
     runs-on: ubuntu-latest
-    if: needs.builder-exists.outputs.exists == 'false'
+    continue-on-error: true
 
     steps:
       - run: |-
-          exit 1
+          if [[ $(needs.builder-exists.outputs.exists) == 'true' ]]; then
+            echo "Skip builder creation."
+            exit 1
+          fi
+      - name: some step
+        run: echo "this should be skipped"
 
   lint-go:
     name: Run golangci-lint

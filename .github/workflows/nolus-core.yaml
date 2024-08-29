@@ -2,11 +2,11 @@ name: Nolus-Core
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - "**" # Match any branch
-    tags:
-      - "**" # Match any tag
+  # push:
+  #   branches:
+  #     - "**" # Match any branch
+  #   tags:
+  #     - "**" # Match any tag
 
 env:
   VERSION_TAG: ${{ github.ref_name }}
