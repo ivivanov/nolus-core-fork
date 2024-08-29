@@ -2,11 +2,11 @@ name: Nolus-Core
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - "**" # Match any branch
-  #   tags:
-  #     - "**" # Match any tag
+  push:
+    branches:
+      - "**" # Match any branch
+    tags:
+      - "**" # Match any tag
 
 env:
   VERSION_TAG: ${{ github.ref_name }}
@@ -47,16 +47,18 @@ jobs:
     name: Create builder image
     needs: builder-exists
     runs-on: ubuntu-latest
-    if: needs.builder-exists.outputs.exists == 'false'
 
     steps:
       - name: Checkout code
+        if: needs.builder-exists.outputs.exists != 'true'
         uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
+        if: needs.builder-exists.outputs.exists != 'true'
         uses: docker/setup-buildx-action@v2
 
       - name: Log in to GitHub Container Registry
+        if: needs.builder-exists.outputs.exists != 'true'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.CONTAINER_REGISTRY }}
@@ -64,6 +66,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
+        if: needs.builder-exists.outputs.exists != 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -153,10 +156,6 @@ jobs:
       # TODO: change repo!
       image: "ghcr.io/ivivanov/nolus-core-fork/builder:1.22.3"
     needs: [builder-create, test-unit-coverage]
-    if: >
-      always() &&
-      (needs.test-unit-coverage.result == 'success') &&
-      (needs.builder-create.result == 'skipped' || needs.builder-create.result == 'success')
 
     steps:
       - uses: actions/checkout@v4
@@ -194,9 +193,6 @@ jobs:
     name: Add metadata
     runs-on: ubuntu-latest
     needs: build-binary
-    if: >
-      always() &&
-      (needs.build-binary.result == 'success')
 
     steps:
       - name: Download artifacts
@@ -232,24 +228,24 @@ jobs:
         run: |
           if [[ "${GITHUB_REF}" =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Tag matches pattern v*.*.*"
-            echo "tag_matches=true" >> $GITHUB_ENV
+            echo "continue=true" >> $GITHUB_ENV
           else
             echo "Tag does not match pattern v*.*.*"
-            echo "tag_matches=false" >> $GITHUB_ENV
+            echo "continue=false" >> $GITHUB_ENV
           fi
 
       # The job will continue only if the tag matches the pattern
       - name: Download artifacts
-        if: env.tag_matches == 'true'
+        if: env.continue == 'true'
         uses: actions/download-artifact@v4
 
       - name: Display structure of downloaded files
-        if: env.tag_matches == 'true'
+        if: env.continue == 'true'
         run: ls -R
 
       # temporary using commit as version until it is merged. Updates node version v12 -> v16
       - uses: "marvinpinto/action-automatic-releases@6273874b61ebc8c71f1a61b2d98e234cf389b303"
-        if: env.tag_matches == 'true'
+        if: env.continue == 'true'
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
