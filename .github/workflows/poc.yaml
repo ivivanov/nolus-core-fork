@@ -2,11 +2,11 @@ name: POC
 
 on:
   workflow_dispatch:
-  # push:
+  push:
   #   branches:
   #     - "**" # Match any branch
-  #   tags:
-  #     - "**" # Match any tag
+    tags:
+      - "v*.*.*"
 
 env:
   VERSION_TAG: ${{ github.ref_name }}
@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       exists: ${{ steps.check.outputs.exists }}
+    if: github.ref_type == "tag"
     steps:
       - id: "check"
         name: Check if image exists
